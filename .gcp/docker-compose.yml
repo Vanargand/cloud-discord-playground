@@ -1,0 +1,14 @@
+version: '3.2'
+services:
+  init:
+    image: hashicorp/terraform:0.12.2
+    working_dir: /app
+    command: ["init"]
+    volumes:
+      - ./:/app
+  plan:
+    image: hashicorp/terraform:0.12.2
+    working_dir: /app
+    command: plan -var-file="terraform.tfvars" -out="out.tfplan"
+    volumes:
+      - ./:/app
