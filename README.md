@@ -4,7 +4,12 @@ Just a small playground for messing around with various cloud providers' contain
 # Notes
 ## GCP
 * Google Cloud Run seems really cool
-* Unfortunately the terraform provider for GCP does not yet support the necessary objects to get something running without manual console clicking
+* Unfortunately the terraform provider and sdk for GCP does not yet support the necessary objects to get something running without manual console clicking
+###Requirements
+* Requires Google Cloud SDK
+* GCloud Toiols for Powershell
+* `gcloud components install beta`
+* Docker
 
 ## Azure
-* todo
+* need to check out azure service plans
