@@ -20,7 +20,7 @@ func main() {
         botID = user.ID
         discord.AddHandler(commandHandler)
         discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
-                err = discord.UpdateStatus(0, "Weebin around")
+                err = discord.UpdateStatus(0, "Status!")
                 if err != nil {
                 fmt.Println("Error attempting to set my status")
                 }
