@@ -2,29 +2,57 @@ package main
 
 import (
         "fmt"
-        "log"
-        "net/http"
         "os"
+        "github.com/bwmarrin/discordgo"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-        log.Print("Hello world received a request.")
-        target := os.Getenv("TARGET")
-        if target == "" {
-                target = "World"
-        }
-        fmt.Fprintf(w, "Hello %s!\n", target)
-}
+var (
+        commandPrefix string
+        botID         string
+)
 
 func main() {
-        log.Print("Hello world sample started.")
+        discord, err := discordgo.New("Bot " + os.Getenv("DISCORD_BOT_KEY"))
+        errCheck("error creating discord session", err)
+        user, err := discord.User("@me")
+        errCheck("error retrieving account", err)
+  
+        botID = user.ID
+        discord.AddHandler(commandHandler)
+        discord.AddHandler(func(discord *discordgo.Session, ready *discordgo.Ready) {
+                err = discord.UpdateStatus(0, "Weebin around")
+                if err != nil {
+                fmt.Println("Error attempting to set my status")
+                }
+                servers := discord.State.Guilds
+                fmt.Printf("Weebot has started on %d servers", len(servers))
+        })
+  
+        err = discord.Open()
+        errCheck("Error opening connection to Discord", err)
+        defer discord.Close()
 
-        http.HandleFunc("/", handler)
+        commandPrefix = "!"
 
-        port := os.Getenv("PORT")
-        if port == "" {
-                port = "8080"
+        <-make(chan struct{})
+    
+}
+
+func errCheck(msg string, err error) {
+        if err != nil {
+                fmt.Printf("%s: %+v", msg, err)
+                panic(err)
+        }
+}
+
+func commandHandler(discord *discordgo.Session, message *discordgo.MessageCreate) {
+        user := message.Author
+        if user.ID == botID || user.Bot {
+                //Do nothing because the bot is talking
+                return
         }
 
-        log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+        if message.Content == "!hello" {
+                discord.ChannelMessageSend(message.ChannelID, "Hey!")
+        }
 }

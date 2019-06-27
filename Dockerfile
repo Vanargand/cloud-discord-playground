@@ -1,8 +1,9 @@
-FROM golang:1.12-alpine AS builder
+FROM golang:1.12 AS builder
 
 WORKDIR /build
 COPY ./src .
 
+RUN go get -d -v github.com/bwmarrin/discordgo
 RUN CGO_ENABLED=0 GOOS=linux go build -v -o discord-bot
 
 FROM alpine:3.9.4

@@ -1,0 +1,8 @@
+version: '3.2'
+services:
+  discord-bot:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment: 
+    - DISCORD_BOT_KEY=<key>
