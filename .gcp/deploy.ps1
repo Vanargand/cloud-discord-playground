@@ -1,16 +1,23 @@
-$hostname="gcr.io"
-#env var
-$projectId=$env:GCP_PROJECT_ID
-$image="discord_bot"
-$tag="0.0.1"
+param (
+    [Parameter(Mandatory=$true)][string]$projectId,
+    [string]$tag
+)
 
-#get latest tag
-$tags= (gcloud container images list-tags $hostname/$projectId/$image --limit=1 --format=json) | Out-String
-Write-Host $tags
+$hostname = "gcr.io";
+$image = "discord-bot";
+$region = "us-central1";
+$buildnumber = "";
+
+if($tag) {
+    $buildnumber = $tag
+} else {
+    #get latest tag
+    $tags = (gcloud container images list-tags $hostname/$projectId/$image --limit=1 --format=json) | ConvertFrom-Json
+    $buildnumber = $tags[0].tags[0]
+}
+Write-Host $buildnumber
 
 #build
-#docker build .. -t "$($hostname)/$($projectId)/$($image):$($tag)"
-
-#gcloud docker -- push "$($hostname)/$($projectId)/$($image):$($tag)"
-
-#gcloud beta run deploy --image "$($hostname)/$($projectId)/$($image):$($tag)" --platform-managed
+docker build .. -t "$($hostname)/$($projectId)/$($image):$($buildnumber)"
+gcloud docker -- push "$($hostname)/$($projectId)/$($image):$($buildnumber)"
+gcloud beta run deploy --image "$($hostname)/$($projectId)/$($image):$($buildnumber)" --platform=managed --no-allow-unauthenticated --region="$($region)" "$($image)"
